@@ -1,0 +1,19 @@
+# A small shop backend. The browser hides the admin button, checks "has paid"
+# before showing the download, and sends the price with the order. All three of
+# those are decisions, and all three are made on the wrong machine.
+services:
+  mongo:
+    image: mongo:7
+    command: ["--quiet"]
+  parse:
+    image: parseplatform/parse-server:7.4.0
+    depends_on: [mongo]
+    ports: ["1343:1337"]
+    volumes: ["./cloud:/parse-server/cloud:ro"]
+    environment:
+      PARSE_SERVER_APPLICATION_ID: shop
+      PARSE_SERVER_MASTER_KEY: shop-master-key
+      PARSE_SERVER_DATABASE_URI: mongodb://mongo:27017/dev
+      PARSE_SERVER_CLOUD: /parse-server/cloud/main.js
+      PARSE_SERVER_MASTER_KEY_IPS: "0.0.0.0/0,::/0"
+      GUARD_ENTITLEMENT: "${GUARD_ENTITLEMENT:-false}"
